@@ -1,0 +1,23 @@
+{% extends 'template.html.twig' %}
+
+{% block body %}
+    <div class="alert alert-success">
+        {{ personne.firstname }}  {{ personne.name }} a {{ personne.age }} ans
+
+        {% if app.user %}
+        <p>Created by : {{ app.user.email }}</p>
+
+        {% endif %}
+        <a href="{{ path('personne.pdf', { id: personne.id }) }}" class="btn btn-danger" target="_blank">
+            <i class="fas fa-file-pdf"></i> Télécharger PDF
+        </a>
+
+    </div>
+
+{% endblock %}
+
+{% block title %}
+
+    {{ personne.firstname }}  {{ personne.name }}
+{% endblock %}
+

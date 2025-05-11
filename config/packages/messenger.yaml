@@ -3,27 +3,33 @@ framework:
         failure_transport: failed
 
         transports:
-            # https://symfony.com/doc/current/messenger.html#transport-configuration
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
-                    use_notify: true
-                    check_delayed_interval: 60000
+                    use_notify: true              # Better for database performance
+                    check_delayed_interval: 60000 # Check for delayed messages every 60s
                 retry_strategy:
-                    max_retries: 3
-                    multiplier: 2
-            failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
+                    max_retries: 3               # Max retry attempts
+                    delay: 1000                  # Initial delay in ms (1s)
+                    multiplier: 2                # Exponential backoff (1s, 2s, 4s)
+                    max_delay: 10000             # Max 10s between retries
 
-        default_bus: messenger.bus.default
+            failed:
+                dsn: 'doctrine://default?queue_name=failed'
+
+            sync: 'sync://'  # Uncommented for emergency use
 
         buses:
-            messenger.bus.default: []
+            messenger.bus.default: ~
 
         routing:
-            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
-            Symfony\Component\Notifier\Message\ChatMessage: async
-            Symfony\Component\Notifier\Message\SmsMessage: async
+            # Email messages (now with proper retry handling)
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': async
 
-            # Route your messages to the transports
+
+            # Notification messages
+            'Symfony\Component\Notifier\Message\ChatMessage': async
+            'Symfony\Component\Notifier\Message\SmsMessage': async
+
+            # Example for custom messages
             # 'App\Message\YourMessage': async

@@ -1,0 +1,44 @@
+{% extends 'template.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<form method="post">
+    {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3">
+            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+        </div>
+    {% endif %}
+
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label for="inputEmail">Email</label>
+    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+    <label for="inputPassword">Password</label>
+    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+
+    <input type="hidden" name="_csrf_token"
+           value="{{ csrf_token('authenticate') }}"
+    >
+
+    <div class="checkbox mb-3">
+        <input type="checkbox" id="remember_me" name="_remember_me" />
+        <label for="remember_me">Remember Me</label>
+    </div>
+
+    <button class="btn btn-lg btn-primary mt-2" type="submit">
+        Sign in
+    </button>
+    {% if app.user and not app.user.isVerified %}
+        <div class="mt-4">
+            <p>Votre compte n'est pas encore vérifié.</p>
+            <a href="{{ path('app_verify_resend') }}" class="btn btn-secondary">
+                Renvoyer l'email de confirmation
+            </a>
+        </div>
+    {% endif %}
+</form>
+{% endblock %}
